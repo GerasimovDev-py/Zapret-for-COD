@@ -15,7 +15,7 @@
 
 | Файл | Назначение |
 |---|---|
-| `general (CoD).bat` | Безопасная для CoD стратегия: обход только по доменам, без `ipset` и без Game Filter. |
+| `general (CoD).bat` | Безопасная для CoD стратегия: обход только по доменам, ALT-правила для Discord/YouTube, без `ipset` и без Game Filter. |
 | `lists/list-exclude-user.txt` | Домены CoD, Activision, Blizzard, Battle.net, Demonware, Steam CDN и Xbox, которые zapret не должен трогать. |
 | `lists/ipset-exclude-user.txt` | IP-диапазоны Blizzard (AS57976), Demonware (AS60229) и Akamai-пулы CoD/Battle.net. |
 | `bin/monkey_delete.cmd` | Исправлен: раньше ссылался на отсутствующий `tools\elevator`, теперь сам запрашивает права администратора. |
@@ -81,6 +81,8 @@ service.bat → Install Service → general (CoD)
 Типовые игровые порты CoD (`3074`, `3079`, `3478-3479`, `4379-4380`, `27000-27050` и т.п.) в этот список не входят. Кроме того, в файле нет правил `--ipset`, поэтому даже при включённом IPSet-фильтре эта стратегия не будет трогать игровые IP.
 
 Для YouTube/Google используется ALT-вариант обхода (`fake,fakedsplit`), потому что стандартный `multisplit` на проверенном провайдере не открывал YouTube.
+
+Для Discord также используется ALT-вариант: общее TCP-правило `fake,hostfakesplit`, а `discord.media` — `fake,multisplit` с `fooling=ts`. Это важно для голоса: `discord.media:8443` у провайдера блокируется по TLS, и Discord переключается на `discord.media:443`; со стандартным `multisplit` переход зависал на «Подключение».
 
 Домены CoD/Blizzard и их IP дополнительно исключены на случай, если вы позже запустите другую стратегию с `ipset`.
 
@@ -177,7 +179,8 @@ Test-NetConnection battle.net -Port 443
 - включите Secure DNS (DoH) в браузере/Windows;
 - `service.bat` → `Update Hosts File`;
 - `service.bat` → `Run Diagnostics` и очистите кэш Discord;
-- попробуйте другую стратегию.
+- попробуйте другую стратегию;
+- если голосовой канал висит на «Подключение», проверьте, что запущен обновлённый `general (CoD).bat`, в системе только один `winws.exe`, а `discord.media:443` открывается; порт 8443 может быть заблокирован — Discord должен уйти на 443.
 
 **Не работает YouTube:**
 - включите Secure DNS;
@@ -235,7 +238,7 @@ For autostart: `service.bat` → `Install Service` → `general (CoD)`.
 
 ## What `general (CoD).bat` does
 
-It applies DPI desync only to hostnames from the domain lists (Discord, YouTube/Google, Cloudflare and user-added domains). It uses TCP `80,443,2053,2083,2087,2096,8443` and UDP `443,19294-19344,50000-50100`. Typical CoD game ports (`3074`, `3079`, `3478-3479`, `4379-4380`, `27000-27050`, etc.) are not in these ranges, and there are no `--ipset` rules at all. Therefore game traffic is not processed. The Google/YouTube TCP 443 rule uses the ALT `fake,fakedsplit` variant, because the stock `multisplit` rule did not open YouTube on the tested ISP.
+It applies DPI desync only to hostnames from the domain lists (Discord, YouTube/Google, Cloudflare and user-added domains). It uses TCP `80,443,2053,2083,2087,2096,8443` and UDP `443,19294-19344,50000-50100`. Typical CoD game ports (`3074`, `3079`, `3478-3479`, `4379-4380`, `27000-27050`, etc.) are not in these ranges, and there are no `--ipset` rules at all. Therefore game traffic is not processed. The Google/YouTube TCP 443 rule uses the ALT `fake,fakedsplit` variant, because the stock `multisplit` rule did not open YouTube on the tested ISP. Discord also uses ALT-style rules (`fake,hostfakesplit` for general TCP and `fake,multisplit` for `discord.media`) so voice can fall back from blocked `discord.media:8443` to `discord.media:443`.
 
 ## Important settings
 
@@ -284,7 +287,7 @@ Back up `lists/*-user.txt`; `lists/ipset-all.txt` is managed by `service.bat` an
 
 - **CoD crashes or reports network services unavailable:** verify the DLL hash, run `bin\monkey_delete.cmd`, reboot, start zapret first, then the game. If it still fails, the method may not work for your setup; play without zapret or use a separate device/router.
 - **Packet loss/lag:** disable Game Filter, set IPSet Filter to `none`, avoid `IPSet any`, try another strategy.
-- **Discord issues:** enable Secure DNS, update hosts, clear Discord cache via diagnostics, try another strategy.
+- **Discord issues:** enable Secure DNS, update hosts, clear Discord cache via diagnostics, try another strategy. If a voice channel is stuck on "Connecting", make sure the updated `general (CoD).bat` is running, only one `winws.exe` exists, and `discord.media:443` is reachable; port 8443 may be blocked, and Discord should fall back to 443.
 - **YouTube issues:** enable Secure DNS, try another strategy, ensure the domains are not in `list-exclude-user.txt`.
 - **No internet after changes:** set IPSet Filter to `none` and Game Filter to disabled, restart zapret.
 

@@ -1,6 +1,5 @@
 # Call of Duty в России: инструкция для этой сборки zapret
 
-Этот README относится **только к запуску Call of Duty** с обходом DPI в данной папке. Полная документация по всем стратегиям zapret здесь намеренно не приводится.
 
 Сборка основана на [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/zapret-discord-youtube) версии `1.10.4` и доработана под CoD.
 

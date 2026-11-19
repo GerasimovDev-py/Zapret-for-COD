@@ -80,7 +80,7 @@ service.bat → Install Service → general (CoD)
 
 Типовые игровые порты CoD (`3074`, `3079`, `3478-3479`, `4379-4380`, `27000-27050` и т.п.) в этот список не входят. Кроме того, в файле нет правил `--ipset`, поэтому даже при включённом IPSet-фильтре эта стратегия не будет трогать игровые IP.
 
-Для YouTube/Google используется ALT-вариант обхода (`fake,fakedsplit`), потому что стандартный `multisplit` на проверенном провайдере не открывал YouTube.
+Для YouTube/Google используется `hostfakesplit` (как в `general (ALT13)`): стандартный `multisplit` не открывал YouTube, а `fake,fakedsplit` давал медленную загрузку страниц и видео. Текущий вариант загружает быстрее.
 
 Для Discord также используется ALT-вариант: общее TCP-правило `fake,hostfakesplit`, а `discord.media` — `fake,multisplit` с `fooling=ts`. Это важно для голоса: `discord.media:8443` у провайдера блокируется по TLS, и Discord переключается на `discord.media:443`; со стандартным `multisplit` переход зависал на «Подключение».
 
@@ -238,7 +238,7 @@ For autostart: `service.bat` → `Install Service` → `general (CoD)`.
 
 ## What `general (CoD).bat` does
 
-It applies DPI desync only to hostnames from the domain lists (Discord, YouTube/Google, Cloudflare and user-added domains). It uses TCP `80,443,2053,2083,2087,2096,8443` and UDP `443,19294-19344,50000-50100`. Typical CoD game ports (`3074`, `3079`, `3478-3479`, `4379-4380`, `27000-27050`, etc.) are not in these ranges, and there are no `--ipset` rules at all. Therefore game traffic is not processed. The Google/YouTube TCP 443 rule uses the ALT `fake,fakedsplit` variant, because the stock `multisplit` rule did not open YouTube on the tested ISP. Discord also uses ALT-style rules (`fake,hostfakesplit` for general TCP and `fake,multisplit` for `discord.media`) so voice can fall back from blocked `discord.media:8443` to `discord.media:443`.
+It applies DPI desync only to hostnames from the domain lists (Discord, YouTube/Google, Cloudflare and user-added domains). It uses TCP `80,443,2053,2083,2087,2096,8443` and UDP `443,19294-19344,50000-50100`. Typical CoD game ports (`3074`, `3079`, `3478-3479`, `4379-4380`, `27000-27050`, etc.) are not in these ranges, and there are no `--ipset` rules at all. Therefore game traffic is not processed. The Google/YouTube TCP 443 rule uses `hostfakesplit` (as in `general (ALT13)`): stock `multisplit` did not open YouTube, while `fake,fakedsplit` loaded pages and video more slowly. Discord also uses ALT-style rules (`fake,hostfakesplit` for general TCP and `fake,multisplit` for `discord.media`) so voice can fall back from blocked `discord.media:8443` to `discord.media:443`.
 
 ## Important settings
 
